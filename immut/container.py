@@ -1,7 +1,4 @@
 class _ImmutableContainerType(type):
-    def __new__(mcs, name, bases, dct):
-        return super(_ImmutableContainerType, mcs).__new__(mcs, name, bases, dct)
-
     def __init__(cls, name, bases, dct):
         super(_ImmutableContainerType, cls).__init__(name, bases, dct)
         cls._attributes = dct.get('attributes', [])
@@ -25,26 +22,8 @@ class _ImmutableContainerType(type):
         return setter
 
 
-class _ImmutableContainer(object):
-    """
-    example usage:
+def _make_container(container_name, *attributes):
+    return _ImmutableContainerType(container_name, (object,), dict(attributes=[attr for attr in attributes]))
 
-    RequestModel = ImmutableContainer('RequestModel', 'signature', 'user_id')
 
-    u = User('jonathan')
-    rm = RequestModel('test_signature', u)
-    print rm.signature  # prints 'test_signature'
-    rm.signature = 'another_signature'  # raises AttributeError
-    print rm.password  # raises AttributeError
-
-    # Or, without specifying all parameters
-    ResponseModel = ImmutableContainer('ResponseModel', 'message', 'code')
-    response = ResponseModel(message='success')
-    response.status  # returns None
-    """
-    __metaclass__ = _ImmutableContainerType
-
-    def __call__(self, name, *args, **_):
-        return _ImmutableContainerType(name, (object,), dict(attributes=[attr for attr in args]))
-
-ImmutableContainer = _ImmutableContainer()
+ImmutableContainer = _make_container
