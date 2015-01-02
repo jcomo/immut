@@ -5,11 +5,11 @@ class _ImmutableContainerType(type):
     def __init__(cls, name, bases, dct):
         super(_ImmutableContainerType, cls).__init__(name, bases, dct)
         cls._attributes = dct.get('attributes', [])
-        cls.__init__ = cls.__make_initializer()
-        cls.__setattr__ = cls.__make_setattr()
+        cls.__init__ = cls.__get_initializer()
+        cls.__setattr__ = cls.__get_setattr()
 
-    def __make_initializer(cls):
-        def initializer(self, *args, **kwargs):
+    def __get_initializer(cls):
+        def initializer(self, *_, **kwargs):
             if any(attr not in cls._attributes for attr in kwargs.keys()):
                 raise ValueError("Unknown attributes specified in constructor for class {}".format(cls.__name__))
             for attr in cls._attributes:
@@ -17,7 +17,7 @@ class _ImmutableContainerType(type):
                 self.__dict__[attr] = value
         return initializer
 
-    def __make_setattr(cls):
+    def __get_setattr(cls):
         def setter(self, name, value):
             if name in cls._attributes:
                 raise AttributeError("Property {} is immutable".format(name))
@@ -44,7 +44,7 @@ class _ImmutableContainer(object):
     """
     __metaclass__ = _ImmutableContainerType
 
-    def __call__(self, name, *args, **kwargs):
+    def __call__(self, name, *args, **_):
         return _ImmutableContainerType(name, (object,), dict(attributes=[attr for attr in args]))
 
 ImmutableContainer = _ImmutableContainer()
