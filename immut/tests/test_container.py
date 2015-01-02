@@ -60,3 +60,20 @@ class ContainerTestCase(unittest.TestCase):
 
         self.assertEquals(c1.message, 'hi')
         self.assertRaises(AttributeError, getattr, c2, 'message')
+
+    def test_setter_error_messages(self):
+        TestContainer = ImmutableContainer('TestContainer', 'message')
+        c = TestContainer(message='hi')
+        try:
+            c.message = 'hey'
+            self.fail("Expected AttributeError")
+        except AttributeError as e:
+            self.assertEquals(e.message, "Property message is immutable")
+
+    def test_constructor_error_messages(self):
+        TestContainer = ImmutableContainer('TestContainer', 'message')
+        try:
+            TestContainer(status=0)
+            self.fail("Expected ValueError")
+        except ValueError as e:
+            self.assertEquals(e.message, "Unknown attributes specified for class TestContainer")
