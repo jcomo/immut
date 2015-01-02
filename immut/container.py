@@ -13,7 +13,7 @@ class _ImmutableContainerType(type):
             if any(attr not in cls._attributes for attr in kwargs.keys()):
                 raise ValueError("Unknown attributes specified in constructor for class {}".format(cls.__name__))
             for attr in cls._attributes:
-                value = kwargs.get(attr, None)  # TODO: this can be parametrized for custom default values
+                value = kwargs.get(attr, None)
                 self.__dict__[attr] = value
         return initializer
 
@@ -29,7 +29,7 @@ class _ImmutableContainer(object):
     """
     example usage:
 
-    RequestModel = ImmutableContainer('signature', 'user_id')
+    RequestModel = ImmutableContainer('RequestModel', 'signature', 'user_id')
 
     u = User('jonathan')
     rm = RequestModel('test_signature', u)
@@ -37,15 +37,9 @@ class _ImmutableContainer(object):
     rm.signature = 'another_signature'  # raises AttributeError
     print rm.password  # raises AttributeError
 
-    ResponseModel = ImmutableContainer('message', 'code', builder=True)
-    builder = ResponseModel()
-    response = builder.message('hi').status(200).build()
-
-    print response.message  # prints 'hi'
-    response.message = 'hey'  # raises AttributeError
-
     # Or, without specifying all parameters
-    response = builder.message('hi').build()
+    ResponseModel = ImmutableContainer('ResponseModel', 'message', 'code')
+    response = ResponseModel(message='success')
     response.status  # returns None
     """
     __metaclass__ = _ImmutableContainerType
