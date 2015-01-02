@@ -40,9 +40,10 @@ you are assigning to.
 A dynamically generated immutable container
 
 **Behavior**
-* Trying to set a specified field on the immutable container after creation will raise an AttributeError.
-* Setting a *non-specified* field on the container will be allowed, but is not recommended as it is outside the scope
-of the use case and is bad python programming practice in general.
+* Trying to set a specified field on the immutable container after creation will raise an `AttributeError`.
+* Setting a *non-specified* field in the constructor will raise a `ValueError`
+  * Setting a non-specified field on the container after construction is allowed, but is not recommended as it is
+  outside the scope of the use case and is bad python programming practice in general.
 * Non-initialized fields in the constructor will return `None` when accessed.
 
 
