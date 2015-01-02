@@ -1,24 +1,26 @@
 class _ImmutableContainerType(type):
     def __init__(cls, name, bases, dct):
         super(_ImmutableContainerType, cls).__init__(name, bases, dct)
-        cls._attributes = dct.get('attributes', [])
-        cls.__init__ = cls.__get_initializer()
-        cls.__setattr__ = cls.__get_setattr()
+        attributes = dct.get('attributes', [])
+        cls.__init__ = cls.__class__.make_initializer(attributes)
+        cls.__setattr__ = cls.__class__.make_setattr(attributes)
 
-    def __get_initializer(cls):
+    @classmethod
+    def make_initializer(mcs, attributes):
         def initializer(self, *_, **kwargs):
-            if any(attr not in cls._attributes for attr in kwargs.keys()):
-                raise ValueError("Unknown attributes specified in constructor for class {}".format(cls.__name__))
-            for attr in cls._attributes:
+            if any(attr not in attributes for attr in kwargs.keys()):
+                raise ValueError("Unknown attributes specified for class {}".format(self.__class__.__name__))
+            for attr in attributes:
                 value = kwargs.get(attr, None)
                 self.__dict__[attr] = value
         return initializer
 
-    def __get_setattr(cls):
+    @classmethod
+    def make_setattr(mcs, attributes):
         def setter(self, name, value):
-            if name in cls._attributes:
+            if name in attributes:
                 raise AttributeError("Property {} is immutable".format(name))
-            super(cls, self).__setattr__(name, value)
+            super(self.__class__, self).__setattr__(name, value)
         return setter
 
 
