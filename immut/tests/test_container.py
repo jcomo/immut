@@ -1,5 +1,5 @@
 import unittest
-from immut.container import ImmutableContainer
+from immut import ImmutableContainer
 
 
 class ContainerTestCase(unittest.TestCase):
