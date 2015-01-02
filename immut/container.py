@@ -25,6 +25,12 @@ class _ImmutableContainerType(type):
 
 
 def _make_container(container_name, *attributes):
+    if not isinstance(container_name, basestring):
+        raise TypeError("Container name must be a string")
+    if not container_name:
+        raise ValueError("Empty container name")
+    if not all(isinstance(attr, basestring) for attr in attributes):
+        raise TypeError("All attributes must be strings")
     return _ImmutableContainerType(container_name, (object,), dict(attributes=[attr for attr in attributes]))
 
 

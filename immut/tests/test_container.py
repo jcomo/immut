@@ -61,6 +61,11 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(c1.message, 'hi')
         self.assertRaises(AttributeError, getattr, c2, 'message')
 
+    def test_container_error_messages(self):
+        self.assertRaisesRegexp(ValueError, r"Empty container name", ImmutableContainer, '')
+        self.assertRaisesRegexp(TypeError, r"Container name must be a string", ImmutableContainer, 0)
+        self.assertRaisesRegexp(TypeError, r"All attributes must be strings", ImmutableContainer, 'TestContainer', 0)
+
     def test_setter_error_messages(self):
         TestContainer = ImmutableContainer('TestContainer', 'message')
         c = TestContainer(message='hi')
