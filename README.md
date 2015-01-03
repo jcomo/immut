@@ -9,6 +9,10 @@ around the application knowing that the contents will not be modified after crea
 
 
 ## Example usage
+```
+pip install immut
+```
+
 ```python
 from immut import ImmutableContainer
 
