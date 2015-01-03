@@ -58,7 +58,7 @@ def _make_container(container_name, *attributes):
         raise ValueError("Empty container name")
     if not all(isinstance(attr, basestring) for attr in attributes):
         raise TypeError("All attributes must be strings")
-    return _ImmutableContainerType(container_name, (object,), dict(attributes=[attr for attr in attributes]))
+    return _ImmutableContainerType(container_name, (object,), dict(attributes=attributes))
 
 
 ImmutableContainer = _make_container
