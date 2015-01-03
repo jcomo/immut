@@ -51,3 +51,6 @@ A dynamically generated immutable container
 I know this isn't the most pythonic or useful library in the world. It was conceived
 as a way for me to learn how meta classes work. However, it has its uses, and it is
 well tested.
+
+##### Differences with `collections.namedtuple`
+There are many similarities with this library and `collections.namedtuple`. The main difference is in the behavior with initialization. With a namedtuple, each defined attribute must be initialized in the constructor but with this container library, attributes are initialized to None by default if they are unspecified in the constructor.
