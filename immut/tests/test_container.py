@@ -82,6 +82,15 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(c1.message, 'hi')
         self.assertRaises(AttributeError, getattr, c2, 'message')
 
+    def test_container_repr(self):
+        EmptyContainer = ImmutableContainer('EmptyContainer', [])
+        ec = EmptyContainer()
+        self.assertEquals(repr(ec), 'EmptyContainer()')
+
+        Container = ImmutableContainer('Container', ['message', 'user'])
+        c = Container(message='hi')
+        self.assertEquals(repr(c), 'Container(message=hi, user=None)')
+
     def test_container_error_messages(self):
         self.assertRaisesRegexp(
             ValueError, r"Empty container name",

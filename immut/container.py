@@ -9,6 +9,7 @@ class _ImmutableContainerType(type):
         strict = dct.get('strict', True)
         cls.__init__ = cls.__class__.make_initializer(attributes, strict)
         cls.__setattr__ = cls.__class__.make_setattr(attributes)
+        cls.__repr__ = cls.__class__.make_repr(name)
 
     @classmethod
     def make_initializer(mcs, attributes, strict):
@@ -41,6 +42,20 @@ class _ImmutableContainerType(type):
                 raise AttributeError("Property {} is immutable".format(name))
             super(self.__class__, self).__setattr__(name, value)
         return setter
+
+    @classmethod
+    def make_repr(mcs, class_name):
+        """
+        Create the repr method for the class.
+
+        :param: class_name the name of the class created
+        :return: repr version that shows the class name and attribute names and values
+        """
+        def representation(self):
+            attributes = ['{}={}'.format(attr, value) for attr, value in self.__dict__.iteritems()]
+            attributes_representation = ', '.join(attributes)
+            return '{}({})'.format(class_name, attributes_representation)
+        return representation
 
 
 def _make_container(container_name, attributes, allow_others=False):
