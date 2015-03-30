@@ -6,11 +6,12 @@ class _ImmutableContainerType(type):
     def __init__(cls, name, bases, dct):
         super(_ImmutableContainerType, cls).__init__(name, bases, dct)
         attributes = dct.get('attributes', [])
-        cls.__init__ = cls.__class__.make_initializer(attributes)
+        strict = dct.get('strict', True)
+        cls.__init__ = cls.__class__.make_initializer(attributes, strict)
         cls.__setattr__ = cls.__class__.make_setattr(attributes)
 
     @classmethod
-    def make_initializer(mcs, attributes):
+    def make_initializer(mcs, attributes, strict):
         """
         Create the init method for the class
 
@@ -19,7 +20,7 @@ class _ImmutableContainerType(type):
         were specified in the list of attributes
         """
         def initializer(self, *_, **kwargs):
-            if any(attr not in attributes for attr in kwargs.keys()):
+            if strict and any(attr not in attributes for attr in kwargs.keys()):
                 raise ValueError("Unknown attributes specified for class {}".format(self.__class__.__name__))
             for attr in attributes:
                 value = kwargs.get(attr, None)
@@ -42,23 +43,40 @@ class _ImmutableContainerType(type):
         return setter
 
 
-def _make_container(container_name, *attributes):
+def _make_container(container_name, attributes, allow_others=False):
     """
     Create a container class.
 
     :param container_name: the name of the container class
     :type container_name: basestring
     :param attributes: strings, each representing a property on instances of the container class
-    :type attributes: basestring
+    :type attributes: basestring, list
     :return: An immutable container class with the specified attributes
     """
-    if not isinstance(container_name, basestring):
-        raise TypeError("Container name must be a string")
-    if not container_name:
-        raise ValueError("Empty container name")
-    if not all(isinstance(attr, basestring) for attr in attributes):
-        raise TypeError("All attributes must be strings")
-    return _ImmutableContainerType(container_name, (object,), dict(attributes=attributes))
+    def _get_attributes():
+        if not isinstance(attributes, list):
+            try:
+                return attributes.split(' ')
+            except AttributeError:
+                raise TypeError("Invalid attributes. Use either a list or space delimited string")
+        else:
+            return attributes
+
+    def _validate_container_name():
+        if not isinstance(container_name, basestring):
+            raise TypeError("Container name must be a string")
+        if not container_name:
+            raise ValueError("Empty container name")
+
+    def _validate_attributes(attrs):
+        if not all(isinstance(attr, basestring) for attr in attrs):
+            raise TypeError("All attributes must be strings")
+
+    attributes = _get_attributes()
+    _validate_container_name()
+    _validate_attributes(attributes)
+    params = dict(attributes=attributes, strict=(not allow_others))
+    return _ImmutableContainerType(container_name, (object,), params)
 
 
 ImmutableContainer = _make_container
