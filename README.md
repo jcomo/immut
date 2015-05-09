@@ -1,6 +1,8 @@
 # Immut
 An immutable container library for Python
 
+![](https://travis-ci.org/jcomo/immut.svg?branch=master)
+
 ## Use case
 The intended use case for this library is to create named immutable container classes
 to use in an application. This would be particularly useful for value objects. Create

@@ -8,4 +8,4 @@ python:
 install:
   - pip install -U -r requirements.txt
 
-script: py.test tests
+script: py.test immut
