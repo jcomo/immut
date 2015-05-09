@@ -1,6 +1,7 @@
 .idea/
 *.pyc
 
+env*/
 build/
 dist/
 immut.egg-info/
