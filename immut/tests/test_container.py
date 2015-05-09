@@ -89,7 +89,7 @@ class ContainerTestCase(unittest.TestCase):
 
         Container = ImmutableContainer('Container', ['message', 'user'])
         c = Container(message='hi')
-        self.assertEquals(repr(c), 'Container(message=hi, user=None)')
+        self.assertEquals(repr(c), "Container(message='hi', user=None)")
 
     def test_container_error_messages(self):
         self.assertRaisesRegexp(

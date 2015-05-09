@@ -22,7 +22,7 @@ class _ImmutableContainerType(type):
         """
         def initializer(self, *_, **kwargs):
             if strict and any(attr not in attributes for attr in kwargs.keys()):
-                raise ValueError("Unknown attributes specified for class {}".format(self.__class__.__name__))
+                raise ValueError("Unknown attributes specified for class %s" % self.__class__.__name__)
             for attr in attributes:
                 value = kwargs.get(attr, None)
                 self.__dict__[attr] = value
@@ -39,7 +39,7 @@ class _ImmutableContainerType(type):
         """
         def setter(self, name, value):
             if name in attributes:
-                raise AttributeError("Property {} is immutable".format(name))
+                raise AttributeError("Property %s is immutable" % name)
             super(self.__class__, self).__setattr__(name, value)
         return setter
 
@@ -52,9 +52,9 @@ class _ImmutableContainerType(type):
         :return: repr version that shows the class name and attribute names and values
         """
         def representation(self):
-            attributes = ['{}={}'.format(attr, value) for attr, value in self.__dict__.iteritems()]
+            attributes = ['%s=%s' % (attr, repr(value)) for attr, value in self.__dict__.iteritems()]
             attributes_representation = ', '.join(attributes)
-            return '{}({})'.format(class_name, attributes_representation)
+            return '%s(%s)' % (class_name, attributes_representation)
         return representation
 
 
