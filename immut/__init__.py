@@ -1,3 +1,3 @@
 __author__ = 'Jonathan Como'
 
-from container import ImmutableContainer
+from .container import ImmutableContainer

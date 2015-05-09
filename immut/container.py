@@ -1,3 +1,6 @@
+import six
+
+
 class _ImmutableContainerType(type):
     """
     Metaclass for immutable container. Creating an immutable container class gives modified init and setattr
@@ -52,7 +55,8 @@ class _ImmutableContainerType(type):
         :return: repr version that shows the class name and attribute names and values
         """
         def representation(self):
-            attributes = ['%s=%s' % (attr, repr(value)) for attr, value in self.__dict__.iteritems()]
+            sorted_attributes = sorted(six.iteritems(self.__dict__), key=lambda e: e[0])
+            attributes = ['%s=%s' % (attr, repr(value)) for attr, value in sorted_attributes]
             attributes_representation = ', '.join(attributes)
             return '%s(%s)' % (class_name, attributes_representation)
         return representation
@@ -78,13 +82,13 @@ def _make_container(container_name, attributes, allow_others=False):
             return attributes
 
     def _validate_container_name():
-        if not isinstance(container_name, basestring):
+        if not isinstance(container_name, six.string_types):
             raise TypeError("Container name must be a string")
         if not container_name:
             raise ValueError("Empty container name")
 
     def _validate_attributes(attrs):
-        if not all(isinstance(attr, basestring) for attr in attrs):
+        if not all(isinstance(attr, six.string_types) for attr in attrs):
             raise TypeError("All attributes must be strings")
 
     attributes = _get_attributes()

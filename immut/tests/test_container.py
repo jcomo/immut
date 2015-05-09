@@ -1,8 +1,24 @@
+import re
+import six
 import unittest
 from immut import ImmutableContainer
 
 
 class ContainerTestCase(unittest.TestCase):
+    # Ugly hack to support python 2.6
+    def assertRaisesRegexp(self, exc, regexp, f, *args, **kwargs):
+        spr = super(ContainerTestCase, self)
+        if hasattr(spr, 'assertRaisesRegexp'):
+            return spr.assertRaisesRegexp(exc, regexp, f, *args, **kwargs)
+
+        try:
+            f(*args, **kwargs)
+        except exc as e:
+            message_contains_regexp = re.search(regexp, e.message)
+            assert message_contains_regexp, "Expected to find regexp %s" % repr(regexp)
+        else:
+            self.fail("%s not raised" % exc.__class__.__name__)
+
     def test_empty_container(self):
         Container = ImmutableContainer('Container', [])
         c = Container()
@@ -92,32 +108,22 @@ class ContainerTestCase(unittest.TestCase):
         self.assertEquals(repr(c), "Container(message='hi', user=None)")
 
     def test_container_error_messages(self):
-        self.assertRaisesRegexp(
-            ValueError, r"Empty container name",
-            ImmutableContainer, '', [])
-        self.assertRaisesRegexp(
-            TypeError, r"Container name must be a string",
-            ImmutableContainer, 0, [])
-        self.assertRaisesRegexp(
-            TypeError, r"Invalid attributes. Use either a list or space delimited string",
-            ImmutableContainer, 'TestContainer', 0)
-        self.assertRaisesRegexp(
-            TypeError, r"All attributes must be strings",
-            ImmutableContainer, 'TestContainer', [0])
+        six.assertRaisesRegex(self,  ValueError, r"Empty container name",
+                              ImmutableContainer, '', [])
+        six.assertRaisesRegex(self, TypeError, r"Container name must be a string",
+                              ImmutableContainer, 0, [])
+        six.assertRaisesRegex(self, TypeError, r"Invalid attributes. Use either a list or space delimited string",
+                              ImmutableContainer, 'TestContainer', 0)
+        six.assertRaisesRegex(self, TypeError, r"All attributes must be strings",
+                              ImmutableContainer, 'TestContainer', [0])
 
     def test_setter_error_messages(self):
         TestContainer = ImmutableContainer('TestContainer', 'message')
         c = TestContainer(message='hi')
-        try:
-            c.message = 'hey'
-            self.fail("Expected AttributeError")
-        except AttributeError as e:
-            self.assertEquals(e.message, "Property message is immutable")
+        six.assertRaisesRegex(self, AttributeError, "Property message is immutable",
+                              setattr, c, 'message', 'hey')
 
     def test_constructor_error_messages(self):
         TestContainer = ImmutableContainer('TestContainer', 'message')
-        try:
-            TestContainer(status=0)
-            self.fail("Expected ValueError")
-        except ValueError as e:
-            self.assertEquals(e.message, "Unknown attributes specified for class TestContainer")
+        six.assertRaisesRegex(self, ValueError, "Unknown attributes specified for class TestContainer",
+                              TestContainer, status=0)
